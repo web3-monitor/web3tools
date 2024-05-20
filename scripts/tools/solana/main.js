@@ -7,11 +7,6 @@ const { AmountOfWallet } = require('../../utils');
 
 const wallets = require('./wallets.json');
 
-async function faucet() {
-    const tx = await solana.faucet(wallets.mainWallet.publicKey);
-    console.log('tx: ', tx);
-}
-
 async function createWallets(num, type = 'bs58') {
     const wallets = await solana.createWallets(parseInt(num), type);
     console.log(wallets);
