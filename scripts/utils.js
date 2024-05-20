@@ -1,6 +1,6 @@
-class AmountOfAddress {
-    constructor(address, amount) {
-        this.address = address;
+class AmountOfWallet {
+    constructor(wallet, amount) {
+        this.wallet = wallet;
         this.amount = amount;
     }
 }
@@ -11,5 +11,5 @@ function sleep(ms) {
 
 module.exports = {
     sleep,
-    AmountOfAddress
+    AmountOfWallet: AmountOfWallet
 };

@@ -1,0 +1,52 @@
+{
+    "gasWallet": {
+        "publicKey": "FcfC68ojnSBCbVTdfU5QVEWox3nEtK7t3dcAs5eKBhsq",
+        "privateKey": "29jWECjn1W8K6BockiaATxH5k2AQJjSbP478K8YNTexLg2eww1CioQhJABFVTdAJvj5RtrYpApWQeq3yAebbu8SF"
+    },
+    "mainWallet": {
+        "publicKey": "FcfC68ojnSBCbVTdfU5QVEWox3nEtK7t3dcAs5eKBhsq",
+        "privateKey": "29jWECjn1W8K6BockiaATxH5k2AQJjSbP478K8YNTexLg2eww1CioQhJABFVTdAJvj5RtrYpApWQeq3yAebbu8SF"
+    },
+    "sonWallets": [
+        {
+            "publicKey": "2A5oxf83kTuLtKNBbtrYB869v9KXF1BcaDLL3aRTwCt4",
+            "privateKey": "26bG9CyX35eqcnJqiLDZjKHk89xzzxCw8F9VnTeEnxrxTB9N5RE6usx6PtVzY6rVh21gaJkNH1LcnJiTYmryqURJ"
+        },
+        {
+            "publicKey": "9XPHLruV8cyMT2afxN1iZ4TPMXve2eQ5YuDEGCcn9Rcg",
+            "privateKey": "3cBcB25q5AmP2i7ezWtSEExko829DJbe329jgU3LKAXLSH3yvkf4Yr2z7BBkWoVrPq1ng1Q5Uw5z2vboaPb4Ze5S"
+        },
+        {
+            "publicKey": "A2oL4VPJLjGehBwsKKrVGiHTHvgerUtBtgE5mFAmNRXu",
+            "privateKey": "4t37armywVoGts6ANn7cJE2JhBF7Fr9mPrXZvmUXJ9raVqetPtMRGfTvKXzUHc4Ps5Hxe3ho3ypvHQt4QPpfjz1u"
+        },
+        {
+            "publicKey": "332xZ91szTuvQMtqxZRDkb4tmXCDenZxVDWdebYJgXox",
+            "privateKey": "2DNBgiXsVQWoV8e1dDGfR2XHpXzf2wgCQEdyL1LoTRCQ1vqhf9w98kFyk22QsLBeU5w2gXP9wfpvom2zS78yknVY"
+        },
+        {
+            "publicKey": "E5Au13RAgXfd1zhR6ua8qM9j5C7wMvw9mQF3i6y9YE31",
+            "privateKey": "5eaftUFM8yn3MqteVjscGBcJnpnMwDLafmHV5wibpKa2TTt3cg6E8vgYu1mZXrt44pwgekwz6k5UQUWPkSZ2kpUX"
+        },
+        {
+            "publicKey": "4ec6apRGVBmzLtyn33u2Z3yHUa4oV3HAQktbuoZQUS3r",
+            "privateKey": "CqRgDhKEKoASm1AmgvhxsZWsEob2kQto3tFNri6ehiEUK5iCkBWF5gRHFkwYxMQDCTwoJKNvZQox2jJcPxpBfEg"
+        },
+        {
+            "publicKey": "BRwztuTXhcvvRGvhcwZnUu3t1KKPQAhH1Yt8cfVZgnPY",
+            "privateKey": "5GvAFX2CMnm4QmDCi3m5YzhD65tuGU3hX5NvnzW7qJk49RBXBcXmriLuq7QtahqjCTuFV1ugVFzUHcGQrLehXn62"
+        },
+        {
+            "publicKey": "9bWbZbtsKvzmR1msGZbRb7jXSx3SvccQ8Npk7M4zNucL",
+            "privateKey": "5FeGVQSwykjtTr8PTpYV2ffrSm6GWcawhCJqCdbAgPbi1dGBYpwjzdqr2QjFo8zKxkBJ8fStGiyY9yFRqj53TAjJ"
+        },
+        {
+            "publicKey": "5qEHFShYH3441gejesZRpVRjDvzmHaYJzok7biFahaep",
+            "privateKey": "28HSx9E2Mug9SgoqH2JX6rn1RJhAmDd57ju59VAAfo3yAgF2KwTB4KgpGw9NZVpNVFucmsrnBdehbwXDFrtrrpcc"
+        },
+        {
+            "publicKey": "68T3ugqYRkyK8bVqhe3CtbCUsxD8s5BbpxKmeQaQ4Hhd",
+            "privateKey": "5UUuhvMW24cCYeesv2Rj4bhu9VrXmsiLFejDKhtxwBV5uECagHxdjrChgkXhtgtJvjEq13QWof9idj8QhY41RGHZ"
+        }
+    ]
+}
