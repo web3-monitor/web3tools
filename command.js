@@ -5,6 +5,17 @@ const solanaJs = require('./scripts/chain/solana/main.js');
 const solana = program.command('solana');
 
 solana
+    .command('faucet')
+    .description('faucet, get test SOL from testnet/devnet faucet')
+    .action(async () => {
+        try {
+            await solanaJs.faucet();
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+solana
     .command('create <num> [type]')
     .description('create wallets')
     .action(async (num, type = 'bs58') => {
@@ -36,5 +47,11 @@ solana
             console.error(error);
         }
     });
+
+
+
+
+
+
 
 program.parse(process.argv);

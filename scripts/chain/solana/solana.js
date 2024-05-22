@@ -223,9 +223,20 @@ async function multi2oneSendSol(fromPrivateKeys, toPublicKey, feePayer, bacthSiz
     return txs;
 }
 
+async function faucet(publicKeyStr) {
+    while (true) {
+        const publicKey = new solanaWeb3.PublicKey(publicKeyStr);
+        const tx = await connection.requestAirdrop(publicKey, solanaWeb3.LAMPORTS_PER_SOL);
+        connection.confirmTransaction(tx);
+
+    }
+}
+
+
 module.exports = {
     createWallets,
     getSolBalance,
     one2multiSendSol,
-    multi2oneSendSol
+    multi2oneSendSol,
+    faucet
 };
