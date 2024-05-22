@@ -1,8 +1,19 @@
 const { Command } = require('commander');
 const program = new Command();
-const solanaJs = require('./scripts/tools/solana/main.js');
+const solanaJs = require('./scripts/chain/solana/main.js');
 
 const solana = program.command('solana');
+
+solana
+    .command('faucet')
+    .description('faucet, get test SOL from testnet/devnet faucet')
+    .action(async () => {
+        try {
+            await solanaJs.faucet();
+        } catch (error) {
+            console.error(error);
+        }
+    });
 
 solana
     .command('create <num> [type]')
@@ -10,6 +21,17 @@ solana
     .action(async (num, type = 'bs58') => {
         try {
             await solanaJs.createWallets(num, type);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+solana
+    .command('createPretty <prefix> <suffix> <numThreads>')
+    .description('create pretty accounts')
+    .action(async (prefix, suffix, numThreads) => {
+        try {
+            await solanaJs.createPrettyAccount(prefix, suffix, numThreads);
         } catch (error) {
             console.error(error);
         }
@@ -36,5 +58,33 @@ solana
             console.error(error);
         }
     });
+
+solana
+    .command('distributeSpl <tokenAddress> <amount>')
+    .description('distribute SPL token to sonWallets')
+    .action(async (tokenAddress, amount) => {
+        try {
+            await solanaJs.distributeSplToken(tokenAddress, amount);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+
+solana
+    .command('collectSpl <tokenAddress> <amount> [type]')
+    .description('collect SPL token from sonWallets, type defaults to "part" if not provided.')
+    .action(async (tokenAddress, amount, type = 'part') => {
+        try {
+            await solanaJs.collectSplToken(tokenAddress, amount, type);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+
+
+
+
 
 program.parse(process.argv);
