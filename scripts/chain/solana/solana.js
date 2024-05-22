@@ -46,7 +46,13 @@ async function createWallets(num, type = 'bs58') {
     return wallets;
 }
 
-function createWalletsWithThreads(prefix, suffix, numThreads) {
+/**
+ * 
+ * @param {*} prefix 前缀
+ * @param {*} suffix 后缀
+ * @param {*} numThreads 线程数量
+ */
+function createPrettyAccount(prefix, suffix, numThreads) {
     if (isMainThread) {
         // 主线程
         const workers = new Array(numThreads).fill(null).map(() => {
@@ -223,13 +229,155 @@ async function multi2oneSendSol(fromPrivateKeys, toPublicKey, feePayer, bacthSiz
     return txs;
 }
 
-async function faucet(publicKeyStr) {
-    while (true) {
-        const publicKey = new solanaWeb3.PublicKey(publicKeyStr);
-        const tx = await connection.requestAirdrop(publicKey, solanaWeb3.LAMPORTS_PER_SOL);
-        connection.confirmTransaction(tx);
-
+async function one2multiSendSplToken(tokenAddress, fromPrivateKey, toPublicKeys, bacthSize = 10) {
+    if (!Array.isArray(toPublicKeys)) {
+        throw new Error('toPublicKeys must be an array');
     }
+    toPublicKeys.forEach(item => {
+        if (!(item instanceof AmountOfWallet)) {
+            throw new Error('Each item in toPublicKeys must be an instance of AmountOfWallet');
+        }
+    });
+    // 单条交易有字节上限，因此限制一条交易中最多发送sol给10个地址
+    if (bacthSize > 10) {
+        throw new Error('bacthSize must be less than 10');
+    }
+    const sender = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(fromPrivateKey));
+    const token = new splToken.Token(connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, sender);
+    const senderTokenAccountInfo = await token.getOrCreateAssociatedAccountInfo(sender.publicKey);
+    let num = bacthSize;
+    let transaction = new solanaWeb3.Transaction();
+    let txs = [];
+    let toPubkeys = [];
+
+    for (const item of toPublicKeys) {
+        const toAccount = new solanaWeb3.PublicKey(item.wallet);
+        const toAccountTokenAccountInfo = await token.getOrCreateAssociatedAccountInfo(toAccount);
+        toPubkeys.push(item.wallet);
+        transaction.add(
+            splToken.Token.createTransferInstruction(
+                splToken.TOKEN_PROGRAM_ID,
+                senderTokenAccountInfo.address,
+                toAccountTokenAccountInfo.address,
+                sender.publicKey,
+                [],
+                solanaWeb3.LAMPORTS_PER_SOL * item.amount
+            )
+        )
+        num--;
+        if (num === 0) {
+            try {
+                transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [sender]);
+                console.log('send splToken to multi wallet:', toPubkeys, 'successed,', 'transaction:', signature);
+                txs.push(signature);
+            } catch (error) {
+                console.error('send splToken to multi wallet:', toPubkeys, 'failed');
+            }
+            transaction = new solanaWeb3.Transaction();
+            num = bacthSize;
+            toPubkeys = [];
+        }
+    }
+    if (num > 0 && num < bacthSize) {
+        try {
+            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+            const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [sender]);
+            console.log('send splToken to multi wallet:', toPubkeys, 'successed,', 'transaction:', signature);
+            txs.push(signature);
+        } catch (error) {
+            console.error('send splToken to multi wallet:', toPubkeys, 'failed');
+        }
+    }
+    return txs;
+}
+
+async function multi2oneSendSplToken(tokenAddress, fromPrivateKeys, toPublicKey, feePayer, bacthSize = 7) {
+    if (!Array.isArray(fromPrivateKeys)) {
+        throw new Error('fromPrivateKeys must be an array');
+    }
+    if (fromPrivateKeys.length === 0) {
+        throw new Error('fromPrivateKeys must not be empty');
+    }
+    // 单条交易有字节上限，因此限制一条交易中最多从8个地址发送sol
+    if (bacthSize > 8) {
+        throw new Error('bacthSize must be less than 10');
+    }
+    fromPrivateKeys.forEach(item => {
+        if (!(item instanceof AmountOfWallet)) {
+            throw new Error('Each item in fromPrivateKeys must be an instance of AmountOfWallet');
+        }
+    });
+    const toAccount = (await splToken.Token.getAssociatedTokenAddress(splToken.ASSOCIATED_TOKEN_PROGRAM_ID, splToken.TOKEN_PROGRAM_ID, new solanaWeb3.PublicKey(tokenAddress), new solanaWeb3.PublicKey(toPublicKey)));
+    const feePayerAccount = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(feePayer));
+
+    let num = bacthSize;
+    let senders = [];
+    let transaction = new solanaWeb3.Transaction();
+    let txs = [];
+
+    for (const item of fromPrivateKeys) {
+        const sender = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(item.wallet));
+        const token = new splToken.Token(connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, sender);
+        const senderTokenAccountInfo = await token.getOrCreateAssociatedAccountInfo(sender.publicKey);
+        transaction.add(
+            splToken.Token.createTransferInstruction(
+                splToken.TOKEN_PROGRAM_ID,
+                senderTokenAccountInfo.address,
+                toAccount,
+                sender.publicKey,
+                [],
+                solanaWeb3.LAMPORTS_PER_SOL * item.amount
+            )
+        )
+        senders.push(sender);
+        num--;
+        if (num === 0) {
+            try {
+                transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [feePayerAccount].concat(senders));
+                console.log('collect splToken from multi wallet:', senders.map(item => {
+                    return item.publicKey.toBase58();
+                }
+                ), 'successed,', 'transaction:', signature);
+                txs.push(signature);
+            }
+            catch (error) {
+                console.error(error)
+                console.error('collect splToken from multi wallet:', senders.map(item => {
+                    return item.publicKey;
+                }
+                ), 'failed');
+            }
+            transaction = new solanaWeb3.Transaction();
+            num = bacthSize;
+            senders = [];
+        }
+    }
+    if (num > 0 && num < bacthSize) {
+        try {
+            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+            const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [feePayerAccount].concat(senders));
+            console.log('collect splToken from multi wallet:', senders.map(item => {
+                return item.publicKey.toBase58();
+            }
+            ), 'successed,', 'transaction:', signature);
+            txs.push(signature);
+        }
+        catch (error) {
+            console.error('collect splToken from multi wallet:', senders.map(item => {
+                return item.publicKey;
+            }
+            ), 'failed');
+        }
+    }
+    return txs;
+}
+
+
+async function faucet(publicKey) {
+    const tx = await connection.requestAirdrop(new solanaWeb3.PublicKey(publicKey), solanaWeb3.LAMPORTS_PER_SOL);
+    return tx;
 }
 
 
@@ -238,5 +386,9 @@ module.exports = {
     getSolBalance,
     one2multiSendSol,
     multi2oneSendSol,
-    faucet
+    faucet,
+    createPrettyAccount,
+    one2multiSendSplToken,
+    multi2oneSendSplToken,
+    connection
 };

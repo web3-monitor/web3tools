@@ -27,6 +27,17 @@ solana
     });
 
 solana
+    .command('createPretty <prefix> <suffix> <numThreads>')
+    .description('create pretty accounts')
+    .action(async (prefix, suffix, numThreads) => {
+        try {
+            await solanaJs.createPrettyAccount(prefix, suffix, numThreads);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+solana
     .command('distribute <amount>')
     .description('distribute SOL to sonWallets')
     .action(async (amount) => {
@@ -48,6 +59,28 @@ solana
         }
     });
 
+solana
+    .command('distributeSpl <tokenAddress> <amount>')
+    .description('distribute SPL token to sonWallets')
+    .action(async (tokenAddress, amount) => {
+        try {
+            await solanaJs.distributeSplToken(tokenAddress, amount);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+
+solana
+    .command('collectSpl <tokenAddress> <amount> [type]')
+    .description('collect SPL token from sonWallets, type defaults to "part" if not provided.')
+    .action(async (tokenAddress, amount, type = 'part') => {
+        try {
+            await solanaJs.collectSplToken(tokenAddress, amount, type);
+        } catch (error) {
+            console.error(error);
+        }
+    });
 
 
 

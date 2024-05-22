@@ -1,9 +1,10 @@
 const solanaWeb3 = require('@solana/web3.js');
+const splToken = require('@solana/spl-token');
 const bs58 = require('bs58');
 const fs = require('fs');
 const path = require('path');
 const solana = require('./solana.js')
-const { AmountOfWallet } = require('../../utils.js');
+const { AmountOfWallet, sleep } = require('../../utils.js');
 
 const wallets = require('./wallets.json');
 
@@ -21,6 +22,10 @@ async function createWallets(num, type = 'bs58') {
     const data = JSON.stringify(wallets, null, 2);
     fs.writeFileSync(path.join(__dirname, filename), data);
     console.log(`Wallets saved to ${filename}`);
+}
+
+async function createPrettyAccount(prefix, suffix, numThreads) {
+    solana.createPrettyAccount(prefix, suffix, numThreads);
 }
 
 async function distributeSol(amount) {
@@ -62,9 +67,58 @@ async function colletSol(amount, type = 'part') {
     console.log('mainWalletBalance: ', mainBalance, 'SOL');
 }
 
+async function distributeSplToken(tokenAddress, amount) {
+    const walletsWithAmount = wallets.sonWallets.map(wallet => {
+        return new AmountOfWallet(wallet.publicKey, amount);
+    });
+    const mainWallet = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(bs58.decode(wallets.mainWallet.privateKey)));
+    const token = new splToken.Token(solana.connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, mainWallet);
+    let mainBalance = (await token.getOrCreateAssociatedAccountInfo(mainWallet.publicKey)).amount / solanaWeb3.LAMPORTS_PER_SOL;
+
+    console.log('mainWallet token balance: ', mainBalance);
+    if (mainBalance < amount * walletsWithAmount.length) {
+        throw new Error('Insufficient balance of mainWallet');
+    }
+
+    const txs = await solana.one2multiSendSplToken(tokenAddress, bs58.decode(wallets.mainWallet.privateKey), walletsWithAmount, 4);
+    console.log('successfulTxs: ', txs);
+    console.log('waiting for 20s... wait for the token balance to be updated.');
+    await sleep(20000);
+    mainBalance = (await token.getOrCreateAssociatedAccountInfo(mainWallet.publicKey)).amount / solanaWeb3.LAMPORTS_PER_SOL;
+    console.log('mainWallet token balance: ', mainBalance);
+}
+
+async function collectSplToken(tokenAddress, amount, type = 'part') {
+    let walletsWithAmount = [];
+    const token = new splToken.Token(solana.connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, null);
+    const feePayer = bs58.decode(wallets.gasWallet.privateKey);
+    if (type === 'all') {
+        walletsWithAmount = wallets.sonWallets.map(wallet => {
+            const balance = token.getOrCreateAssociatedAccountInfo(new solanaWeb3.PublicKey(wallet.publicKey)).amount / solanaWeb3.LAMPORTS_PER_SOL;
+            return new AmountOfWallet(bs58.decode(wallet.privateKey), balance);
+        });
+    } else if (type === 'part') {
+        walletsWithAmount = wallets.sonWallets.map(wallet => {
+            return new AmountOfWallet(bs58.decode(wallet.privateKey), amount);
+        });
+    }
+
+    let mainBalance = (await token.getOrCreateAssociatedAccountInfo(new solanaWeb3.PublicKey(wallets.mainWallet.publicKey))).amount / solanaWeb3.LAMPORTS_PER_SOL;
+    console.log('mainWallet token balance: ', mainBalance);
+    const txs = await solana.multi2oneSendSplToken(tokenAddress, walletsWithAmount, wallets.mainWallet.publicKey, feePayer);
+    console.log('successfulTxs: ', txs);
+    console.log('waiting for 20s... wait for the token balance to be updated.');
+    await sleep(20000);
+    mainBalance = (await token.getOrCreateAssociatedAccountInfo(new solanaWeb3.PublicKey(wallets.mainWallet.publicKey))).amount / solanaWeb3.LAMPORTS_PER_SOL;
+    console.log('mainWallet token balance: ', mainBalance);
+}
+
 module.exports = {
     createWallets,
     faucet,
     distributeSol,
-    colletSol
+    colletSol,
+    createPrettyAccount,
+    distributeSplToken,
+    collectSplToken
 }
