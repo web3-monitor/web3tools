@@ -3,7 +3,7 @@ const bs58 = require('bs58');
 const fs = require('fs');
 const path = require('path');
 const solana = require('./solana.js')
-const { AmountOfWallet } = require('../../utils');
+const { AmountOfWallet } = require('../../utils.js');
 
 const wallets = require('./wallets.json');
 

@@ -1,6 +1,6 @@
 const { Command } = require('commander');
 const program = new Command();
-const solanaJs = require('./scripts/tools/solana/main.js');
+const solanaJs = require('./scripts/chain/solana/main.js');
 
 const solana = program.command('solana');
 
