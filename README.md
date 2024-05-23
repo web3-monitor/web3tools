@@ -45,9 +45,9 @@ node . solana collect 0.01
 node . solana collect 0 all
 ```
 6.给钱包生成合约代币账户（子钱包会生成合约代币账户，账户费用约0.002sol，从本钱包扣，后续如果不使用，可以退回费用），第一个参数为代币的合约地址
-、、、
+```
 node . solana createSplTokenAccount ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82
-、、、
+```
 7.关闭钱包的合约代币账户（账户费用0.002sol会退回到钱包）
 ```
 node . solana closeSplTokenAccount ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82
