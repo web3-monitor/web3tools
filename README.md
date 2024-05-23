@@ -1,4 +1,9 @@
 # web3tools说明文档
+
+twitter: https://x.com/wohefengyiyang
+github地址: https://github.com/web3-monitor/web3tools
+代码持续更新中...
+
 1.clone项目文件到本地
 
 2.cd web3tools 进入项目文件夹
