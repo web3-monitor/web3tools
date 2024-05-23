@@ -83,7 +83,18 @@ solana
     });
 
 solana
-    .command('closeAccount <tokenAddress>')
+    .command('createSplTokenAccount <tokenAddress>')
+    .description('create spl Token address')
+    .action(async (tokenAddress) => {
+        try {
+            await solanaJs.createSplTokenAccount(tokenAddress);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+solana
+    .command('closeSplTokenAccount <tokenAddress>')
     .description('close spl Token address to resume sol to mainWallet')
     .action(async (tokenAddress) => {
         try {
