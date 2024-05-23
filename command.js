@@ -82,6 +82,17 @@ solana
         }
     });
 
+solana
+    .command('closeAccount <tokenAddress>')
+    .description('close spl Token address to resume sol to mainWallet')
+    .action(async (tokenAddress) => {
+        try {
+            await solanaJs.closeAccount(tokenAddress);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
 
 
 

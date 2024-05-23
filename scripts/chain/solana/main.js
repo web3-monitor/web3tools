@@ -119,6 +119,10 @@ async function collectSplToken(tokenAddress, amount, type = 'part') {
     console.log('mainWallet token balance: ', mainBalance);
 }
 
+async function closeAccount(tokenAddress) {
+    await solana.closeAccount(tokenAddress, await Promise.all( wallets.sonWallets.map(wallet => bs58.decode(wallet.privateKey))), wallets.mainWallet.publicKey);
+}
+
 module.exports = {
     createWallets,
     faucet,
@@ -126,5 +130,6 @@ module.exports = {
     colletSol,
     createPrettyAccount,
     distributeSplToken,
-    collectSplToken
+    collectSplToken,
+    closeAccount
 }

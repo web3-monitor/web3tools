@@ -6,6 +6,7 @@ const { sleep, AmountOfWallet } = require('../../utils');
 
 // 获取配置文件以及设置rpc网络
 const config = require('./config.json');
+const { Signer } = require('crypto');
 const rpcUrl = config[config.enableNetwork];
 console.log(`Connecting to ${config.enableNetwork}  ${rpcUrl}`);
 const connection = new solanaWeb3.Connection(rpcUrl);
@@ -374,38 +375,22 @@ async function multi2oneSendSplToken(tokenAddress, fromPrivateKeys, toPublicKey,
     return txs;
 }
 
-async function closeAccount(tokenAddress, privateKeys){
+async function closeAccount(tokenAddress, privateKeys, toAccount) {
     if (!Array.isArray(privateKeys)) {
         throw new Error('privateKeys must be an array');
     }
     if (privateKeys.length === 0) {
         throw new Error('privateKeys must not be empty');
     }
+    const token = new splToken.Token(connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, null);
     for (const item of privateKeys) {
         const wallet = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(item));
-        const token = new splToken.Token(connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, wallet);
-        token.closeAccount(wallet.publicKey);
-        const senderTokenAccountInfo = await token.getOrCreateAssociatedAccountInfo(sender.publicKey);
-        const transaction = new solanaWeb3.Transaction();
-        transaction.add(
-            splToken.Token.createCloseAccountInstruction(
-                splToken.TOKEN_PROGRAM_ID,
-                senderTokenAccountInfo.address,
-                sender.publicKey,
-                sender.publicKey,
-                []
-            )
-        )
-        try {
-            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-            const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [sender]);
-            console.log('close account:', sender.publicKey.toBase58(), 'successed,', 'transaction:', signature);
-        }
-        catch (error) {
-            console.error('close account:', sender.publicKey.toBase58(), 'failed');
-        }
+        const walletTokenAcccount = await splToken.Token.getAssociatedTokenAddress(splToken.ASSOCIATED_TOKEN_PROGRAM_ID, splToken.TOKEN_PROGRAM_ID, new solanaWeb3.PublicKey(tokenAddress), wallet.publicKey);
+        const tx = splToken.Token.createCloseAccountInstruction(splToken.TOKEN_PROGRAM_ID, walletTokenAcccount, wallet.publicKey, wallet.publicKey, []);
+        tx.feePayer = wallet.publicKey;
+        const signature = await solanaWeb3.sendAndConfirmTransaction(connection, new solanaWeb3.Transaction().add(tx), [wallet]);
+        console.log('close account:', wallet.publicKey.toBase58(), 'successed,', 'transaction:', signature);
     }
-
 }
 
 
@@ -424,5 +409,6 @@ module.exports = {
     createPrettyAccount,
     one2multiSendSplToken,
     multi2oneSendSplToken,
+    closeAccount,
     connection
 };
