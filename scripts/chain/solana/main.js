@@ -85,7 +85,7 @@ async function distributeSplToken(tokenAddress, amount) {
         throw new Error('Insufficient balance of mainWallet');
     }
 
-    const txs = await solana.one2multiSendSplToken(tokenAddress, bs58.decode(wallets.mainWallet.privateKey), walletsWithAmount, 4);
+    const txs = await solana.one2multiSendSplToken(tokenAddress, bs58.decode(wallets.mainWallet.privateKey), walletsWithAmount);
     console.log('successfulTxs: ', txs);
     console.log('waiting for 20s... wait for the token balance to be updated.');
     await sleep(20000);
@@ -119,6 +119,14 @@ async function collectSplToken(tokenAddress, amount, type = 'part') {
     console.log('mainWallet token balance: ', mainBalance);
 }
 
+async function createSplTokenAccount(tokenAddress) {
+    await solana.createSplTokenAccount(tokenAddress, wallets.sonWallets.map(wallet => bs58.decode(wallet.privateKey)));
+}
+
+async function closeAccount(tokenAddress) {
+    await solana.closeAccount(tokenAddress, await Promise.all(wallets.sonWallets.map(wallet => bs58.decode(wallet.privateKey))), wallets.mainWallet.publicKey);
+}
+
 module.exports = {
     createWallets,
     faucet,
@@ -126,5 +134,7 @@ module.exports = {
     colletSol,
     createPrettyAccount,
     distributeSplToken,
-    collectSplToken
+    collectSplToken,
+    createSplTokenAccount,
+    closeAccount
 }
