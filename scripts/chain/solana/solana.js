@@ -374,6 +374,40 @@ async function multi2oneSendSplToken(tokenAddress, fromPrivateKeys, toPublicKey,
     return txs;
 }
 
+async function closeAccount(tokenAddress, privateKeys){
+    if (!Array.isArray(privateKeys)) {
+        throw new Error('privateKeys must be an array');
+    }
+    if (privateKeys.length === 0) {
+        throw new Error('privateKeys must not be empty');
+    }
+    for (const item of privateKeys) {
+        const wallet = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(item));
+        const token = new splToken.Token(connection, new solanaWeb3.PublicKey(tokenAddress), splToken.TOKEN_PROGRAM_ID, wallet);
+        token.closeAccount(wallet.publicKey);
+        const senderTokenAccountInfo = await token.getOrCreateAssociatedAccountInfo(sender.publicKey);
+        const transaction = new solanaWeb3.Transaction();
+        transaction.add(
+            splToken.Token.createCloseAccountInstruction(
+                splToken.TOKEN_PROGRAM_ID,
+                senderTokenAccountInfo.address,
+                sender.publicKey,
+                sender.publicKey,
+                []
+            )
+        )
+        try {
+            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+            const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [sender]);
+            console.log('close account:', sender.publicKey.toBase58(), 'successed,', 'transaction:', signature);
+        }
+        catch (error) {
+            console.error('close account:', sender.publicKey.toBase58(), 'failed');
+        }
+    }
+
+}
+
 
 async function faucet(publicKey) {
     const tx = await connection.requestAirdrop(new solanaWeb3.PublicKey(publicKey), solanaWeb3.LAMPORTS_PER_SOL);
