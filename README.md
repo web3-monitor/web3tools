@@ -34,17 +34,18 @@ node . solana createPretty prefix suffix 8
 ```
 node . solana distribute 0.01
 ```
-5.每个子钱包向主钱包发送0.01sol，如果输入 node . solana collect all ，表示将子钱包中的所有sol都发送给主钱包
+5.每个子钱包向主钱包发送0.01sol，如果输入 node . solana collect 0 all ，表示将子钱包中的所有sol都发送给主钱包
 ```
 node . solana collect 0.01
-node . solana collect all
+node . solana collect 0 all
 ```
 
 6.主钱包向每个子钱包发送100个合约代币，第一个参数为代币的合约地址，第二个为数量
 ```
 node . solana distributeSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 100
 ```
-7.每个子钱包向主钱包发送100个合约代币，如果输入 node . solana collectSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 all ，表示将子钱包中的所有合约代币都发送给主钱包
+7.每个子钱包向主钱包发送100个合约代币，如果输入 node . solana collectSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 0 all ，表示将子钱包中的所有合约代币都发送给主钱包
 ```
 node . solana collectSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 100
+node . solana collectSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 0 all
 ```
