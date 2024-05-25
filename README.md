@@ -61,3 +61,12 @@ node . solana distributeSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 100
 node . solana collectSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 100
 node . solana collectSpl ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82 0 all
 ```
+10.solana代币swap交易。 
+ * @param {*} inputMint 输入币种
+ * @param {*} outputMint 输出币种
+ * @param {*} amount 输入币种的数量（1sol 是 1000000000， 1usdc 是 1000000，需要注意不同币种的decimal）
+ * @param {*} slippageBps 滑点，1 就是 0.01%（万分之一）的滑点
+ * 下面的示例为： 以0.5%的滑点，将0.01sol交换成usdc
+```
+node . solana swap So11111111111111111111111111111111111111112 EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v 10000000 50
+```

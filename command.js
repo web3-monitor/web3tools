@@ -104,7 +104,16 @@ solana
         }
     });
 
-
+solana
+    .command('swap <inputMint> <outputMint> <amount> <slippageBps>')
+    .description('swap token')
+    .action(async (inputMint, outputMint, amount, slippageBps) => {
+        try {
+            await solanaJs.swap(inputMint, outputMint, amount, slippageBps);
+        } catch (error) {
+            console.error(error);
+        }
+    });
 
 
 

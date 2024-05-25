@@ -127,6 +127,11 @@ async function closeAccount(tokenAddress) {
     await solana.closeAccount(tokenAddress, await Promise.all(wallets.sonWallets.map(wallet => bs58.decode(wallet.privateKey))), wallets.mainWallet.publicKey);
 }
 
+async function swap(inputMint, outputMint, amount, slippageBps){
+    const tx = await solana.swap(inputMint, outputMint, amount, slippageBps);
+    console.log('tx: ', tx);
+}
+
 module.exports = {
     createWallets,
     faucet,
@@ -136,5 +141,6 @@ module.exports = {
     distributeSplToken,
     collectSplToken,
     createSplTokenAccount,
-    closeAccount
+    closeAccount,
+    swap
 }
