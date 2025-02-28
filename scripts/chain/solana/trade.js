@@ -19,12 +19,12 @@ const SOL_MINT = 'So11111111111111111111111111111111111111112';
  * @param {*} slippageBps 滑点，1 就是 0.01%（万分之一）的滑点
  */
 async function swap(inputMint, outputMint, amount, slippageBps) {
-    const quoteResponse = await (await fetch(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}`)).json();
+    const quoteResponse = await (await fetch(`https://public.jupiterapi.com?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}&slippageBps=${slippageBps}`)).json();
     console.log(quoteResponse);
 
     // get serialized transactions for the swap
     const { swapTransaction } = await (
-        await fetch('https://quote-api.jup.ag/v6/swap', {
+        await fetch('https://public.jupiterapi.com/swap', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
